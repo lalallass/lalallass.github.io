@@ -1,0 +1,160 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Intro to MapView - Create a 2D map | Sample | ArcGIS Maps SDK for JavaScript 4.29</title>
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+<link href="~/Resource/Css/Site.css" rel="stylesheet" />
+<link href="~/Resource/Script/jquery.layout/jquery.layout.css" rel="stylesheet" />
+<script src="~/Resource/Script/jquery.js"></script>
+<script src="~/Resource/Script/jquery.layout/jquery.layout.js"></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.29/"></script>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/FeatureLayer",
+        "esri/layers/TileLayer",
+        "esri/widgets/Legend",
+        "esri/widgets/ScaleBar",
+        "esri/widgets/Search",
+        "esri/widgets/LayerList",
+        "esri/analysis/LengthDimension",
+        
+     "esri/rest/support/PointBarrier"
+
+   
+       
+        ], 
+        function(Map,MapView,FeatureLayer,TileLayer,Legend,ScaleBar,Search,LayerList,LengthDimension){
+       var flayer =new FeatureLayer({url:"https://www.geosceneonline.cn/server/rest/services/Hosted/%E7%A6%8F%E5%BB%BA%E7%9C%81%E5%B8%82/FeatureServer"});
+      var tiledlayer=new TileLayer({url:"https://tiles.arcgis.com/tiles/nzS0F0zdNLvs7nc8/arcgis/rest/services/China_PopDens_2020/MapServer"});
+      
+    
+
+      
+
+     
+      
+        var map = new Map({
+          basemap: "topo-vector"
+          
+        // layers:[flayer]
+      
+        });
+       map.layers.add(flayer);
+       map.layers.add(tiledlayer);
+       
+      
+        
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 4,
+          center: [15, 65] // longitude, latitude
+        });
+        
+      
+        let legend = new Legend({
+  view: view
+
+  
+});
+view.ui.add(legend, "bottom-right");
+let scaleBar = new ScaleBar({
+  view: view
+});
+// Add widget to the bottom left corner of the view
+view.ui.add(scaleBar, {
+  position: "bottom-left"
+});
+
+const searchWidget = new Search({
+  view: view
+});
+// Adds the search widget below other elements in
+// the top left corner of the view
+view.ui.add(searchWidget, {
+  position: "top-left",
+  index: 2
+});
+let layerList = new LayerList({
+  view: view
+});
+// Adds widget below other elements in the top left corner of the view
+view.ui.add(layerList, {
+  position: "top-left"
+});
+
+// create the dimension object
+const lengthDimension = new LengthDimension({
+   measureType: "vertical",
+   startPoint: new Point({
+      spatialReference: {
+        wkid: 32610
+      },
+      x: 265,
+      y: 24,
+      z: 26
+   }),
+   endPoint: new Point({
+      spatialReference: {
+        wkid: 32610
+      },
+      x: 265,
+      y: 24,
+      z: 38
+   }),
+   orientation: 90,
+   offset: 2
+});
+// create analysis and add the dimension object to it.
+const dimensionAnalysis = new DimensionAnalysis({
+   dimensions: [lengthDimension]
+});
+// add the analysis to the view
+view.analyses.push(dimensionAnalysis);
+const handle = reactiveUtils.when(
+  () => !view.updating,
+  () => {
+    wkidSelect.disabled = false;
+  },
+  { once: true }
+);
+
+this.addHandles(handle);
+
+// Destroy the object
+this.destroy();
+
+
+      });
+      
+    </script>
+  </head>
+
+  <body>
+    <div class="ui-layout-north" style="padding-left:20px;padding-top:10px;height:38px;background-color:#C00">
+            页眉
+         </div>
+      <div class="ui-layout-center">
+        底图
+     </div>
+    
+    <div id="viewDiv"></div>
+    $(function () {
+         $("body").layout();
+     })
+  </body>
+</html>
